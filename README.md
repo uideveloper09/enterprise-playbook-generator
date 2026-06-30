@@ -110,11 +110,16 @@ The playbook is published automatically on every push to `main` via GitHub Actio
 
 **PDF download:** https://uideveloper09.github.io/enterprise-playbook-generator/Enterprise-ERP-UI-Blueprint.pdf
 
-### First-time setup
+### First-time setup (required once)
 
-1. Open **Settings → Pages** in the GitHub repository.
-2. Set **Build and deployment → Source** to **GitHub Actions**.
-3. Push to `main` or run the **Deploy GitHub Pages** workflow manually.
+The deploy job returns **404 Not Found** until GitHub Pages is enabled on the repository.
+
+1. Open **[Repository Settings → Pages](https://github.com/uideveloper09/enterprise-playbook-generator/settings/pages)**
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**
+3. Save, then re-run the workflow:
+   - **[Actions → Deploy GitHub Pages → Re-run all jobs](https://github.com/uideveloper09/enterprise-playbook-generator/actions)**
+
+After Pages is enabled, every push to `main` deploys automatically.
 
 ### Build locally
 
