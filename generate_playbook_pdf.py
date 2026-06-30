@@ -12,7 +12,6 @@ from urllib.parse import quote
 
 
 ROOT = Path(__file__).resolve().parent
-GITHUB_REPO_URL = "https://github.com/uideveloper09/enterprise-playbook-generator"
 ASSETS_BASE = os.environ.get("PLAYBOOK_ASSETS_BASE", "../assets").rstrip("/") + "/"
 DOCS_DIR = ROOT / "docs"
 PLAYBOOK_DIR = ROOT / "playbook"
@@ -528,8 +527,6 @@ def page_footer_html() -> str:
         '<div class="page-footer-copy">\n'
         '<strong>Enterprise ERP UI Blueprint</strong>\n'
         '<span>Force Intellect · Founder Executive Edition 2026</span>\n'
-        f'<a class="page-footer-github" href="{GITHUB_REPO_URL}">'
-        "github.com/uideveloper09/enterprise-playbook-generator</a>\n"
         "</div>\n"
         "</div>\n"
         '<span class="page-footer-label">Strategic Playbook</span>\n'
@@ -2061,17 +2058,6 @@ def build_html() -> str:
       font-weight: 500;
       letter-spacing: 0.03em;
       line-height: 1.2;
-    }}
-    .page-footer-github {{
-      color: var(--blue);
-      font-size: 5.4pt;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      line-height: 1.2;
-      text-decoration: none;
-    }}
-    .page-footer-github:hover {{
-      text-decoration: underline;
     }}
     .page-footer-label {{
       color: #64748b;
