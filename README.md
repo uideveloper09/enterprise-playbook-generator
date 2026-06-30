@@ -32,10 +32,10 @@ generate_pdf.js + Puppeteer ← HTML → PDF
 playbook/Enterprise-ERP-UI-Blueprint.pdf
 ```
 
-GitHub Pages uses a separate HTML-only path:
+GitHub Pages uses a separate static export path (optional / legacy):
 
 ```text
-build_github_pages.py → _site/ → gh-pages branch
+build_github_pages.py → _site/ → Vercel
 ```
 
 Optional Markdown preview:
@@ -126,7 +126,7 @@ python generate_playbook_pdf.py
 node generate_pdf.js
 ```
 
-### GitHub Pages site
+### Static site (Vercel / local preview)
 
 ```bash
 python build_github_pages.py
@@ -136,27 +136,60 @@ Preview from `_site/index.html`.
 
 ---
 
-## Live Deployment (`playbook.bitcraftly.com`)
+## Live Deployment — Vercel (`playbook.bitcraftly.com`)
 
-The playbook is published to **[playbook.bitcraftly.com](https://playbook.bitcraftly.com/)** via GitHub Pages on the `gh-pages` branch.
+The playbook is deployed to **[playbook.bitcraftly.com](https://playbook.bitcraftly.com/)** via [Vercel](https://vercel.com/).
 
 This uses a **subdomain only**. It does **not** change [bitcraftly.com](https://bitcraftly.com/) DNS or hosting.
 
-### DNS (one-time, at your domain provider)
+### Vercel project settings
+
+| Setting | Value |
+|---------|--------|
+| Framework Preset | Other |
+| Build Command | `python3 build_github_pages.py` |
+| Output Directory | `_site` |
+| Install Command | *(leave empty or use `echo skip`)* |
+
+Or connect the GitHub repo — `vercel.json` in the repo root configures this automatically.
+
+### Custom domain (one-time)
+
+1. Vercel Dashboard → Project → **Settings → Domains**
+2. Add `playbook.bitcraftly.com`
+3. At your DNS provider, set the record Vercel shows (usually):
 
 | Type | Name | Value |
 |------|------|-------|
-| CNAME | `playbook` | `uideveloper09.github.io` |
+| CNAME | `playbook` | `cname.vercel-dns.com` |
 
-Do **not** add or change apex (`@`) records for `bitcraftly.com`.
+Do **not** change apex (`@`) records for `bitcraftly.com`.
 
-### GitHub (one-time)
+### Deploy
 
-1. **[Settings → Pages](https://github.com/uideveloper09/enterprise-playbook-generator/settings/pages)** → Source: **Deploy from branch** → `gh-pages` / root
-2. **Custom domain:** `playbook.bitcraftly.com`
-3. Enable **Enforce HTTPS** after DNS propagates
+**Option A — Git push (recommended)**
 
-Every push to `main` runs **Deploy GitHub Pages** and updates the live site.
+Connect `enterprise-playbook-generator` in Vercel → every push to `main` auto-deploys.
+
+**Option B — CLI**
+
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+### Include PDF on live site
+
+Vercel CI builds HTML only. To publish the PDF at `/Enterprise-ERP-UI-Blueprint.pdf`:
+
+```bash
+python generate_playbook.py
+python build_github_pages.py
+git add -f playbook/Enterprise-ERP-UI-Blueprint.pdf   # if needed
+# Or run build locally before vercel deploy — PDF is copied when present
+vercel --prod
+```
 
 ---
 
@@ -225,19 +258,18 @@ Current playbook scope:
 
 ---
 
-## GitHub Pages Deployment
+## Vercel Deployment
 
-The repository includes `.github/workflows/deploy-pages.yml`.
+The repository includes `vercel.json` for zero-config deploys.
 
 **Live URL:** https://playbook.bitcraftly.com/
 
-1. Enable **Settings → Actions → General → Workflow permissions → Read and write**
-2. Add DNS **CNAME**: `playbook` → `uideveloper09.github.io` (subdomain only — [bitcraftly.com](https://bitcraftly.com/) is unaffected)
-3. Enable **Settings → Pages → Deploy from branch → `gh-pages` / root**
-4. Set **Custom domain** to `playbook.bitcraftly.com` and enable **Enforce HTTPS**
-5. Push to `main` or run the workflow manually
+1. Import repo at [vercel.com/new](https://vercel.com/new)
+2. Add domain `playbook.bitcraftly.com` in project settings
+3. Point DNS `playbook` CNAME to Vercel (not `bitcraftly.com` apex)
+4. Push to `main` for automatic deploys
 
-The CI workflow publishes HTML only. PDF generation remains a local build step.
+The Vercel build publishes HTML only. Run `python generate_playbook.py` locally before deploy to include the PDF.
 
 ---
 
@@ -245,7 +277,7 @@ The CI workflow publishes HTML only. PDF generation remains a local build step.
 
 - [x] Official `generate_playbook.py` entry point
 - [x] Build validation and error reporting
-- [x] GitHub Pages deployment
+- [x] Vercel deployment (`vercel.json`)
 - [x] MIT License
 - [ ] Automated PDF artifact in CI
 - [ ] Ordered-list rendering in custom Markdown parser

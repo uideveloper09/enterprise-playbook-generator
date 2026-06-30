@@ -4,6 +4,8 @@
   "private": true,
   "description": "Enterprise Playbook Generator for Markdown to HTML and PDF output",
   "scripts": {
+    "build": "python build_github_pages.py",
+    "build:site": "python build_github_pages.py",
     "build:pdf": "node generate_pdf.js"
   },
   "devDependencies": {

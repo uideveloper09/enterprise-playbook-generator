@@ -35,14 +35,15 @@ def main() -> int:
 
     SITE_DIR.mkdir()
     (SITE_DIR / ".nojekyll").touch()
-    (SITE_DIR / "CNAME").write_text(f"{CUSTOM_DOMAIN}\n", encoding="utf-8")
+    if os.environ.get("WRITE_PAGES_CNAME", "").lower() in {"1", "true", "yes"}:
+        (SITE_DIR / "CNAME").write_text(f"{CUSTOM_DOMAIN}\n", encoding="utf-8")
     shutil.copytree(ASSETS_DIR, SITE_DIR / "assets")
     shutil.copy(PLAYBOOK_HTML, SITE_DIR / "index.html")
 
     if PLAYBOOK_PDF.exists():
         shutil.copy(PLAYBOOK_PDF, SITE_DIR / "Enterprise-ERP-UI-Blueprint.pdf")
 
-    print(f"GitHub Pages site built: {SITE_DIR}")
+    print(f"Static site built: {SITE_DIR}")
     return 0
 
 

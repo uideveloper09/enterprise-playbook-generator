@@ -20,8 +20,8 @@ _site/
 # MkDocs
 site/
 
-# MkDocs
-site/
+# Vercel
+.vercel
 
 # OS
 .DS_Store
