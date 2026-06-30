@@ -2,15 +2,15 @@
 
 Converts Markdown chapters into a premium HTML playbook and a print-ready A4 PDF for the Force Intellect Enterprise ERP UI Engineering Blueprint.
 
-**Repository:** [github.com/uideveloper09/enterprise-playbook-generator](https://github.com/uideveloper09/enterprise-playbook-generator)
+**Live playbook:** [playbook.bitcraftly.com](https://playbook.bitcraftly.com/)
 
-**Live HTML preview:** [uideveloper09.github.io/enterprise-playbook-generator](https://uideveloper09.github.io/enterprise-playbook-generator/)
+**Repository:** [github.com/uideveloper09/enterprise-playbook-generator](https://github.com/uideveloper09/enterprise-playbook-generator)
 
 ---
 
 ## Overview
 
-This project is a focused publishing pipeline for a single executive playbook. It reads chapter Markdown from `docs/`, applies the existing premium layout in `generate_playbook_pdf.py`, writes `playbook/playbook.html`, and exports `playbook/Enterprise-ERP-UI-Blueprint.pdf` with Puppeteer.
+This project is a focused publishing pipeline for a single executive playbook. It reads chapter Markdown from `docs/`, applies the existing premium layout in `generate_playbook_pdf.py`, writes `playbook/index.html`, and exports `playbook/Enterprise-ERP-UI-Blueprint.pdf` with Puppeteer.
 
 The generator is intentionally monolithic. The current HTML and PDF designs are preserved.
 
@@ -25,7 +25,7 @@ generate_playbook.py          ← official entry point
     ↓
 generate_playbook_pdf.py      ← Markdown → HTML
     ↓
-playbook/playbook.html
+playbook/index.html
     ↓
 generate_pdf.js + Puppeteer ← HTML → PDF
     ↓
@@ -136,12 +136,36 @@ Preview from `_site/index.html`.
 
 ---
 
+## Live Deployment (`playbook.bitcraftly.com`)
+
+The playbook is published to **[playbook.bitcraftly.com](https://playbook.bitcraftly.com/)** via GitHub Pages on the `gh-pages` branch.
+
+This uses a **subdomain only**. It does **not** change [bitcraftly.com](https://bitcraftly.com/) DNS or hosting.
+
+### DNS (one-time, at your domain provider)
+
+| Type | Name | Value |
+|------|------|-------|
+| CNAME | `playbook` | `uideveloper09.github.io` |
+
+Do **not** add or change apex (`@`) records for `bitcraftly.com`.
+
+### GitHub (one-time)
+
+1. **[Settings → Pages](https://github.com/uideveloper09/enterprise-playbook-generator/settings/pages)** → Source: **Deploy from branch** → `gh-pages` / root
+2. **Custom domain:** `playbook.bitcraftly.com`
+3. Enable **Enforce HTTPS** after DNS propagates
+
+Every push to `main` runs **Deploy GitHub Pages** and updates the live site.
+
+---
+
 ## Build Pipeline
 
 | Step | Command / File | Output |
 |------|----------------|--------|
 | 1. Validate | `generate_playbook.py` | Checks docs, assets, scripts, markdown, diagrams |
-| 2. HTML | `generate_playbook_pdf.py` | `playbook/playbook.html` |
+| 2. HTML | `generate_playbook_pdf.py` | `playbook/index.html` |
 | 3. PDF | `generate_pdf.js` | `playbook/Enterprise-ERP-UI-Blueprint.pdf` |
 
 The build stops on the first error and returns a non-zero exit code.
@@ -161,7 +185,7 @@ Checking project...
 ✓ generate_pdf.js
 
 Generating HTML...
-✓ playbook.html
+✓ index.html
 
 Generating PDF...
 ✓ Enterprise-ERP-UI-Blueprint.pdf
@@ -176,7 +200,7 @@ Completed Successfully
 
 ```text
 playbook/
-├── playbook.html
+├── index.html
 └── Enterprise-ERP-UI-Blueprint.pdf
 ```
 
@@ -205,9 +229,13 @@ Current playbook scope:
 
 The repository includes `.github/workflows/deploy-pages.yml`.
 
+**Live URL:** https://playbook.bitcraftly.com/
+
 1. Enable **Settings → Actions → General → Workflow permissions → Read and write**
-2. Enable **Settings → Pages → Deploy from branch → `gh-pages` / root**
-3. Push to `main` or run the workflow manually
+2. Add DNS **CNAME**: `playbook` → `uideveloper09.github.io` (subdomain only — [bitcraftly.com](https://bitcraftly.com/) is unaffected)
+3. Enable **Settings → Pages → Deploy from branch → `gh-pages` / root**
+4. Set **Custom domain** to `playbook.bitcraftly.com` and enable **Enforce HTTPS**
+5. Push to `main` or run the workflow manually
 
 The CI workflow publishes HTML only. PDF generation remains a local build step.
 

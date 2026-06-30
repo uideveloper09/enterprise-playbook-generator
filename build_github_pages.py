@@ -11,8 +11,9 @@ from generate_playbook_pdf import collect_build_issues
 
 ROOT = Path(__file__).resolve().parent
 SITE_DIR = ROOT / "_site"
+CUSTOM_DOMAIN = "playbook.bitcraftly.com"
 ASSETS_DIR = ROOT / "assets"
-PLAYBOOK_HTML = ROOT / "playbook" / "playbook.html"
+PLAYBOOK_HTML = ROOT / "playbook" / "index.html"
 PLAYBOOK_PDF = ROOT / "playbook" / "Enterprise-ERP-UI-Blueprint.pdf"
 
 
@@ -34,6 +35,7 @@ def main() -> int:
 
     SITE_DIR.mkdir()
     (SITE_DIR / ".nojekyll").touch()
+    (SITE_DIR / "CNAME").write_text(f"{CUSTOM_DOMAIN}\n", encoding="utf-8")
     shutil.copytree(ASSETS_DIR, SITE_DIR / "assets")
     shutil.copy(PLAYBOOK_HTML, SITE_DIR / "index.html")
 

@@ -29,7 +29,7 @@ FONTS_DIR = ASSETS_DIR / "fonts"
 # Output Files
 # -----------------------------------------------------------------------------
 
-HTML_OUTPUT = OUTPUT_DIR / "playbook.html"
+HTML_OUTPUT = OUTPUT_DIR / "index.html"
 PDF_OUTPUT = OUTPUT_DIR / "Enterprise-ERP-UI-Blueprint.pdf"
 
 # -----------------------------------------------------------------------------

@@ -20,6 +20,9 @@ _site/
 # MkDocs
 site/
 
+# MkDocs
+site/
+
 # OS
 .DS_Store
 Thumbs.db

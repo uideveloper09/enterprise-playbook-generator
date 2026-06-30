@@ -34,6 +34,7 @@ jobs:
         run: |
           test -f _site/index.html
           test -d _site/assets
+          test -f _site/CNAME
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
@@ -41,4 +42,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
           publish_branch: gh-pages
+          cname: playbook.bitcraftly.com
           force_orphan: true

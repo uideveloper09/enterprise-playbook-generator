@@ -14,7 +14,7 @@ const puppeteer = require("puppeteer");
 
 const ROOT = __dirname;
 
-const HTML_FILE = path.join(ROOT, "playbook", "playbook.html");
+const HTML_FILE = path.join(ROOT, "playbook", "index.html");
 
 const OUTPUT_FILE = path.join(
     ROOT,
@@ -98,7 +98,7 @@ async function exportPDF(page) {
 async function run() {
     if (!fs.existsSync(HTML_FILE)) {
         fail(
-            "playbook/playbook.html was not found.",
+            "playbook/index.html was not found.",
             "run 'python generate_playbook.py' to generate HTML before exporting the PDF."
         );
     }
