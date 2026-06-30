@@ -2,6 +2,10 @@
 
 An enterprise-grade Playbook Generator that converts Markdown documents into beautifully designed HTML and production-ready PDF playbooks using Python and Puppeteer.
 
+**Repository:** [github.com/uideveloper09/enterprise-playbook-generator](https://github.com/uideveloper09/enterprise-playbook-generator)
+
+**Live Playbook:** [uideveloper09.github.io/enterprise-playbook-generator](https://uideveloper09.github.io/enterprise-playbook-generator/)
+
 ---
 
 ## ✨ Features
@@ -98,7 +102,29 @@ python generate_playbook.py
 
 ---
 
-## 📄 Output
+## 🌐 GitHub Pages Deployment
+
+The playbook is published automatically on every push to `main` via GitHub Actions.
+
+**Live URL:** https://uideveloper09.github.io/enterprise-playbook-generator/
+
+**PDF download:** https://uideveloper09.github.io/enterprise-playbook-generator/Enterprise-ERP-UI-Blueprint.pdf
+
+### First-time setup
+
+1. Open **Settings → Pages** in the GitHub repository.
+2. Set **Build and deployment → Source** to **GitHub Actions**.
+3. Push to `main` or run the **Deploy GitHub Pages** workflow manually.
+
+### Build locally
+
+```bash
+python build_github_pages.py
+```
+
+Preview the site from `_site/index.html`.
+
+---
 
 Generated files are stored in:
 
@@ -131,7 +157,9 @@ playbook/
 - [ ] Custom templates
 - [ ] CLI support
 - [ ] Docker support
-- [ ] CI/CD pipeline
+- [ ] Plugin architecture
+- [x] CI/CD pipeline
+- [x] GitHub Pages deployment
 - [ ] Plugin architecture
 
 ---

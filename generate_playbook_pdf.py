@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import html
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -9,6 +10,9 @@ from urllib.parse import quote
 
 
 ROOT = Path(__file__).resolve().parent
+GITHUB_REPO_URL = "https://github.com/uideveloper09/enterprise-playbook-generator"
+GITHUB_PAGES_URL = "https://uideveloper09.github.io/enterprise-playbook-generator/"
+ASSETS_BASE = os.environ.get("PLAYBOOK_ASSETS_BASE", "../assets").rstrip("/") + "/"
 DOCS_DIR = ROOT / "docs"
 PLAYBOOK_DIR = ROOT / "playbook"
 HTML_OUTPUT = PLAYBOOK_DIR / "playbook.html"
@@ -345,8 +349,12 @@ def overview_body(markdown: str) -> str:
     return body
 
 
+def asset_src(relative_path: str) -> str:
+    return f"{ASSETS_BASE}{relative_path}"
+
+
 def diagram_src(filename: str) -> str:
-    return f"../assets/diagrams/{quote(filename)}"
+    return asset_src(f"diagrams/{quote(filename)}")
 
 
 def chapter_diagrams_html(filenames: list[tuple[str, str]]) -> str:
@@ -394,7 +402,8 @@ def chapter_header_html(chapter_number: int, chapter_title: str) -> str:
 
     if BRAND_LOGO.exists():
         logo_html = (
-            '<img class="chapter-header-logo" src="../assets/brand/force-logo.png" '
+            '<img class="chapter-header-logo" src="'
+            f'{asset_src("brand/force-logo.png")}" '
             'alt="Force Intellect">\n'
         )
 
@@ -429,6 +438,8 @@ def page_footer_html() -> str:
         '<div class="page-footer-copy">\n'
         '<strong>Enterprise ERP UI Blueprint</strong>\n'
         '<span>Force Intellect · Founder Executive Edition 2026</span>\n'
+        f'<a class="page-footer-github" href="{GITHUB_REPO_URL}">'
+        "github.com/uideveloper09/enterprise-playbook-generator</a>\n"
         "</div>\n"
         "</div>\n"
         '<span class="page-footer-label">Strategic Playbook</span>\n'
@@ -1105,13 +1116,13 @@ def build_html() -> str:
                 'aria-label="Frontend Engineering Playbook cover">\n'
                 '<div class="cover-page-frame" aria-hidden="true"></div>\n'
                 '<div class="cover-art">\n'
-                '<img src="../assets/cover/cover-background.png" alt="" aria-hidden="true">\n'
+                f'<img src="{asset_src("cover/cover-background.png")}" alt="" aria-hidden="true">\n'
                 '</div>\n'
                 '<div class="cover-content">\n'
                 '<div class="cover-panel">\n'
                 '<header class="cover-brand">\n'
                 '<div class="cover-logo-box">\n'
-                '<img class="cover-logo" src="../assets/brand/force-logo.png" alt="Force Intellect">\n'
+                f'<img class="cover-logo" src="{asset_src("brand/force-logo.png")}" alt="Force Intellect">\n'
                 '</div>\n'
                 '</header>\n'
                 '<div class="cover-headline">\n'
@@ -1215,7 +1226,7 @@ def build_html() -> str:
             f'data-label="{html.escape(chapter_label(path))}">\n'
             '<div class="page-watermark">FI</div>\n'
             '<header class="page-header">\n'
-            '<img src="../assets/brand/force-logo.png" alt="Force Intellect">\n'
+            f'<img src="{asset_src("brand/force-logo.png")}" alt="Force Intellect">\n'
             '<span>Frontend Engineering Playbook</span>\n'
             '</header>\n'
             '<div class="chapter-shell">\n'
@@ -1965,6 +1976,17 @@ def build_html() -> str:
       letter-spacing: 0.03em;
       line-height: 1.2;
     }}
+    .page-footer-github {{
+      color: var(--blue);
+      font-size: 5.4pt;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      text-decoration: none;
+    }}
+    .page-footer-github:hover {{
+      text-decoration: underline;
+    }}
     .page-footer-label {{
       color: #64748b;
       font-size: 5.6pt;
@@ -2604,7 +2626,7 @@ def build_html() -> str:
       border-radius: 36mm;
       background:
         linear-gradient(135deg, rgba(8, 47, 143, 0.11), rgba(8, 47, 143, 0)),
-        url("../assets/cover/cover-background.png") center right / contain no-repeat;
+        url("{asset_src("cover/cover-background.png")}") center right / contain no-repeat;
       opacity: 0.18;
       pointer-events: none;
     }}

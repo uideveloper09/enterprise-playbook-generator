@@ -13,6 +13,7 @@ node_modules/
 playbook/*.pdf
 playbook/*.html
 playbook/*.log
+_site/
 
 # OS
 .DS_Store
