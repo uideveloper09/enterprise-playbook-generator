@@ -1,0 +1,90 @@
+site_name: Force Intellect
+site_description: Enterprise ERP UI Engineering Strategy & Execution Blueprint
+site_author: Sanjay Kr. Singh
+site_url: ""
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  logo: assets/images/force-logo.png
+  favicon: assets/images/force-logo.png
+  palette:
+    - scheme: default
+      primary: white
+      accent: blue
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: en
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_css:
+  - assets/css/enterprise.css
+
+extra_javascript:
+  - assets/js/reading-progress.js
+
+copyright: >
+  © 2026 Force Intellect<br>
+  Enterprise ERP UI Engineering Strategy & Execution Blueprint<br>
+  Prepared by Sanjay Kr. Singh
+
+nav:
+  - Overview: index.md
+  - Cover: 00-cover.md
+  - Strategy:
+      - Executive Summary: 01-executive-summary.md
+      - Business Strategy: 02-business-strategy.md
+      - Product Strategy: 03-product-strategy.md
+      - UI Engineering Vision: 04-ui-engineering-vision.md
+      - Engineering Leadership: 05-engineering-leadership.md
+  - Organization:
+      - UI Engineering Organization: 06-ui-engineering-organization.md
+      - Enterprise Frontend Architecture: 07-enterprise-frontend-architecture.md
+      - Design System Strategy: 08-design-system.md
+      - Enterprise Component Library: 09-enterprise-component-library.md
+  - Execution:
+      - Engineering Standards: 10-engineering-standards.md
+      - Engineering Delivery Model: 11-engineering-delivery-model.md
+      - Engineering Excellence Framework: 12-engineering-excellence-framework.md
+      - AI-Augmented Engineering: 13-ai-augmented-engineering.md
+      - 90-Day Transformation Roadmap: 14-90-day-execution-plan.md
+      - Future Vision: 15-future-vision.md
