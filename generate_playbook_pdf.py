@@ -2976,6 +2976,8 @@ def generate_pdf() -> None:
 
 def main() -> None:
     write_html()
+    if os.environ.get("PLAYBOOK_HTML_ONLY", "").lower() in {"1", "true", "yes"}:
+        return
     generate_pdf()
 
 

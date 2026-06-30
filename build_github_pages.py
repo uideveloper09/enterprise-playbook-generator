@@ -16,6 +16,7 @@ PLAYBOOK_PDF = ROOT / "playbook" / "Enterprise-ERP-UI-Blueprint.pdf"
 def main() -> None:
     env = os.environ.copy()
     env["PLAYBOOK_ASSETS_BASE"] = "assets"
+    env["PLAYBOOK_HTML_ONLY"] = "1"
 
     subprocess.run(["python", "generate_playbook_pdf.py"], cwd=ROOT, check=True, env=env)
 

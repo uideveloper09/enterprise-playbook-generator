@@ -16,6 +16,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,17 +27,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-
-      - name: Install Node dependencies
-        run: npm ci
-
       - name: Build GitHub Pages site
         run: python build_github_pages.py
+
+      - name: Verify site output
+        run: |
+          test -f _site/index.html
+          test -d _site/assets
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
