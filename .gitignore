@@ -2,12 +2,14 @@
 .venv/
 __pycache__/
 *.pyc
+*.pyo
 
 # Node
 node_modules/
 
-# VS Code / Cursor
+# IDE
 .vscode/
+.idea/
 
 # Generated output
 playbook/*.pdf
@@ -15,6 +17,13 @@ playbook/*.html
 playbook/*.log
 _site/
 
+# MkDocs
+site/
+
 # OS
 .DS_Store
 Thumbs.db
+
+# Environment
+.env
+.env.*

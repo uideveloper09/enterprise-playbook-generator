@@ -3,7 +3,9 @@
 import html
 import os
 import re
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Callable
 from urllib.parse import quote
@@ -11,11 +13,12 @@ from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent
 GITHUB_REPO_URL = "https://github.com/uideveloper09/enterprise-playbook-generator"
-GITHUB_PAGES_URL = "https://uideveloper09.github.io/enterprise-playbook-generator/"
 ASSETS_BASE = os.environ.get("PLAYBOOK_ASSETS_BASE", "../assets").rstrip("/") + "/"
 DOCS_DIR = ROOT / "docs"
 PLAYBOOK_DIR = ROOT / "playbook"
 HTML_OUTPUT = PLAYBOOK_DIR / "playbook.html"
+PDF_OUTPUT = PLAYBOOK_DIR / "Enterprise-ERP-UI-Blueprint.pdf"
+PDF_SCRIPT = ROOT / "generate_pdf.js"
 COVER_BACKGROUND = ROOT / "assets" / "cover" / "cover-background.png"
 BRAND_LOGO = ROOT / "assets" / "brand" / "force-logo.png"
 DIAGRAMS_DIR = ROOT / "assets" / "diagrams"
@@ -157,6 +160,30 @@ CHAPTER_FOURTEEN_INLINE_DIAGRAM = (
 CHAPTER_FIFTEEN_INLINE_DIAGRAM = (
     "UI engineering strategy infographic.png",
     "UI Engineering Strategy Framework",
+)
+
+ALL_REFERENCED_DIAGRAMS = sorted(
+    {
+        filename
+        for filename, _caption in [
+            *CHAPTER_ONE_DIAGRAMS,
+            CHAPTER_TWO_INLINE_DIAGRAM,
+            CHAPTER_THREE_INLINE_DIAGRAM,
+            CHAPTER_FOUR_INLINE_DIAGRAM,
+            CHAPTER_FOUR_SECOND_INLINE_DIAGRAM,
+            CHAPTER_FIVE_INLINE_DIAGRAM,
+            CHAPTER_SIX_INLINE_DIAGRAM,
+            CHAPTER_SEVEN_INLINE_DIAGRAM,
+            CHAPTER_EIGHT_INLINE_DIAGRAM,
+            CHAPTER_NINE_INLINE_DIAGRAM,
+            CHAPTER_TEN_INLINE_DIAGRAM,
+            CHAPTER_ELEVEN_INLINE_DIAGRAM,
+            CHAPTER_TWELVE_INLINE_DIAGRAM,
+            CHAPTER_THIRTEEN_INLINE_DIAGRAM,
+            CHAPTER_FOURTEEN_INLINE_DIAGRAM,
+            CHAPTER_FIFTEEN_INLINE_DIAGRAM,
+        ]
+    }
 )
 
 
@@ -339,14 +366,87 @@ def chapter_label(path: Path) -> str:
     return label
 
 
-def overview_body(markdown: str) -> str:
-    body = strip_frontmatter(unwrap_outer_code_fence(markdown))
-    marker = "# About This Blueprint"
+def collect_build_issues(*, require_node: bool = False) -> list[str]:
+    issues: list[str] = []
 
-    if marker in body:
-        return body[body.index(marker) :].strip()
+    required_dirs = {
+        "docs": DOCS_DIR,
+        "assets": ROOT / "assets",
+        "playbook": PLAYBOOK_DIR,
+    }
+    for name, path in required_dirs.items():
+        if not path.is_dir():
+            issues.append(
+                f"Missing folder: {name}/\n"
+                f"  Why: the build expects '{path.relative_to(ROOT)}'.\n"
+                f"  Fix: restore the folder from the repository or create it with "
+                f"'mkdir {path.relative_to(ROOT)}'."
+            )
 
-    return body
+    required_files = {
+        "generate_playbook_pdf.py": ROOT / "generate_playbook_pdf.py",
+        "generate_pdf.js": PDF_SCRIPT,
+    }
+    for name, path in required_files.items():
+        if not path.is_file():
+            issues.append(
+                f"Missing file: {name}\n"
+                f"  Why: the build pipeline depends on '{path.name}'.\n"
+                f"  Fix: restore the file from the repository."
+            )
+
+    if DOCS_DIR.is_dir():
+        for page in sorted(ACTIVE_PAGES):
+            if page == "00-cover.md":
+                continue
+            doc_path = DOCS_DIR / page
+            if not doc_path.is_file():
+                issues.append(
+                    f"Missing markdown: docs/{page}\n"
+                    f"  Why: '{page}' is listed in ACTIVE_PAGES.\n"
+                    f"  Fix: add the markdown file or remove it from ACTIVE_PAGES in "
+                    f"generate_playbook_pdf.py."
+                )
+
+    for asset_path, label in (
+        (COVER_BACKGROUND, "cover background image"),
+        (BRAND_LOGO, "brand logo"),
+    ):
+        if not asset_path.is_file():
+            issues.append(
+                f"Missing asset: {asset_path.relative_to(ROOT)}\n"
+                f"  Why: the {label} is required for the cover and chapter headers.\n"
+                f"  Fix: add the file under assets/ or update the path in "
+                f"generate_playbook_pdf.py."
+            )
+
+    if DIAGRAMS_DIR.is_dir():
+        for filename in ALL_REFERENCED_DIAGRAMS:
+            diagram_path = DIAGRAMS_DIR / filename
+            if not diagram_path.is_file():
+                issues.append(
+                    f"Missing diagram: assets/diagrams/{filename}\n"
+                    f"  Why: a chapter references this visual asset.\n"
+                    f"  Fix: add the PNG to assets/diagrams/ or update the chapter "
+                    f"diagram constant in generate_playbook_pdf.py."
+                )
+
+    if require_node and not shutil.which("node"):
+        issues.append(
+            "Node.js is not available on PATH.\n"
+            "  Why: PDF generation uses generate_pdf.js with Puppeteer.\n"
+            "  Fix: install Node.js 20+ and run 'npm install' in the project root."
+        )
+
+    node_modules = ROOT / "node_modules"
+    if require_node and not (node_modules / "puppeteer").is_dir():
+        issues.append(
+            "Puppeteer is not installed.\n"
+            "  Why: generate_pdf.js requires the puppeteer package.\n"
+            "  Fix: run 'npm install' in the project root."
+        )
+
+    return issues
 
 
 def asset_src(relative_path: str) -> str:
@@ -417,15 +517,6 @@ def chapter_header_html(chapter_number: int, chapter_title: str) -> str:
         '<span class="chapter-header-line" aria-hidden="true"></span>\n'
         "</div>\n"
         "</header>\n"
-    )
-
-
-def page_topbar_html(title: str, page_number: int) -> str:
-    return (
-        '<header class="page-topbar">\n'
-        f'<span class="page-topbar-title">{html.escape(title)}</span>\n'
-        f'<span class="page-topbar-number">{page_number:02d}</span>\n'
-        '</header>\n'
     )
 
 
@@ -532,10 +623,6 @@ def preface_page_html() -> str:
         f"{page_footer_html()}"
         "</section>"
     )
-
-
-def overview_page_html(markdown: str) -> str:
-    return preface_page_html()
 
 
 def chapter_body(markdown: str, marker: str = "# Executive Context") -> str:
@@ -2964,22 +3051,72 @@ def build_html() -> str:
 """
 
 
-def write_html() -> None:
-    PLAYBOOK_DIR.mkdir(exist_ok=True)
+def write_html(*, quiet: bool = False) -> Path:
+    PLAYBOOK_DIR.mkdir(parents=True, exist_ok=True)
     HTML_OUTPUT.write_text(build_html(), encoding="utf-8")
-    print(f"HTML generated: {HTML_OUTPUT}")
+    if not quiet:
+        print(f"HTML generated: {HTML_OUTPUT}")
+    return HTML_OUTPUT
 
 
-def generate_pdf() -> None:
-    subprocess.run(["node", "generate_pdf.js"], cwd=ROOT, check=True)
+def generate_pdf() -> Path:
+    if not PDF_SCRIPT.is_file():
+        raise FileNotFoundError(
+            f"Missing file: {PDF_SCRIPT.name}\n"
+            "  Why: PDF export depends on generate_pdf.js.\n"
+            "  Fix: restore generate_pdf.js from the repository."
+        )
+
+    if not HTML_OUTPUT.is_file():
+        raise FileNotFoundError(
+            f"Missing file: {HTML_OUTPUT.relative_to(ROOT)}\n"
+            "  Why: generate_pdf.js reads the generated HTML playbook.\n"
+            "  Fix: run the HTML build before generating the PDF."
+        )
+
+    try:
+        subprocess.run(["node", PDF_SCRIPT.name], cwd=ROOT, check=True)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            "PDF generation failed.\n"
+            "  Why: generate_pdf.js exited with a non-zero status.\n"
+            "  Fix: run 'npm install', verify Node.js 20+ is installed, and retry."
+        ) from exc
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "Node.js was not found.\n"
+            "  Why: generate_pdf.js must be executed with Node.js.\n"
+            "  Fix: install Node.js 20+ and ensure 'node' is available on PATH."
+        ) from exc
+
+    if not PDF_OUTPUT.is_file():
+        raise RuntimeError(
+            f"PDF output was not created: {PDF_OUTPUT.relative_to(ROOT)}\n"
+            "  Why: Puppeteer did not write the expected file.\n"
+            "  Fix: check generate_pdf.js logs and Puppeteer/Chromium installation."
+        )
+
+    return PDF_OUTPUT
 
 
-def main() -> None:
-    write_html()
-    if os.environ.get("PLAYBOOK_HTML_ONLY", "").lower() in {"1", "true", "yes"}:
-        return
-    generate_pdf()
+def main() -> int:
+    html_only = os.environ.get("PLAYBOOK_HTML_ONLY", "").lower() in {"1", "true", "yes"}
+    issues = collect_build_issues(require_node=not html_only)
+    if issues:
+        for issue in issues:
+            print(f"Error: {issue}", file=sys.stderr)
+        return 1
+
+    try:
+        write_html()
+        if not html_only:
+            generate_pdf()
+    except (OSError, RuntimeError, FileNotFoundError) as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

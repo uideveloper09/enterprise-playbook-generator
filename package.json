@@ -1,6 +1,12 @@
 {
+  "name": "enterprise-playbook-generator",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Enterprise Playbook Generator for Markdown to HTML and PDF output",
+  "scripts": {
+    "build:pdf": "node generate_pdf.js"
+  },
   "devDependencies": {
-    "pdf-lib": "^1.17.1",
     "puppeteer": "^25.2.1"
   }
 }

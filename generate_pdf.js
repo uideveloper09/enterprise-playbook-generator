@@ -22,83 +22,88 @@ const OUTPUT_FILE = path.join(
     "Enterprise-ERP-UI-Blueprint.pdf"
 );
 
+function fail(message, fix) {
+    console.error("");
+    console.error("PDF generation failed.");
+    console.error(`  Why: ${message}`);
+    if (fix) {
+        console.error(`  Fix: ${fix}`);
+    }
+    process.exit(1);
+}
+
 async function launchBrowser() {
-
-    return puppeteer.launch({
-
-        headless: true,
-
-        defaultViewport: null,
-
-        args: [
-            "--disable-dev-shm-usage",
-            "--font-render-hinting=medium",
-            "--no-sandbox",
-            "--disable-setuid-sandbox"
-        ]
-    });
-
+    try {
+        return await puppeteer.launch({
+            headless: true,
+            defaultViewport: null,
+            args: [
+                "--disable-dev-shm-usage",
+                "--font-render-hinting=medium",
+                "--no-sandbox",
+                "--disable-setuid-sandbox"
+            ]
+        });
+    } catch (error) {
+        fail(
+            error.message,
+            "run 'npm install' in the project root and ensure Chromium can launch."
+        );
+    }
 }
 
 async function loadPage(browser) {
-
     const page = await browser.newPage();
 
-    await page.goto(
-        "file://" + HTML_FILE,
-        {
-            waitUntil: "networkidle0"
-        }
-    );
+    try {
+        await page.goto("file://" + HTML_FILE, {
+            waitUntil: "networkidle0",
+            timeout: 120000
+        });
+    } catch (error) {
+        fail(
+            `unable to load ${path.relative(ROOT, HTML_FILE)} (${error.message})`,
+            "generate HTML first with 'python generate_playbook.py' and verify local assets load correctly."
+        );
+    }
 
     await page.emulateMediaType("print");
-
     await page.evaluateHandle("document.fonts.ready");
 
     return page;
-
 }
 
 async function exportPDF(page) {
-
-    await page.pdf({
-
-        path: OUTPUT_FILE,
-
-        format: "A4",
-
-        printBackground: true,
-
-        preferCSSPageSize: true,
-
-        margin: {
-
-            top: "0mm",
-
-            right: "0mm",
-
-            bottom: "0mm",
-
-            left: "0mm"
-
-        }
-
-    });
-
+    try {
+        await page.pdf({
+            path: OUTPUT_FILE,
+            format: "A4",
+            printBackground: true,
+            preferCSSPageSize: true,
+            margin: {
+                top: "0mm",
+                right: "0mm",
+                bottom: "0mm",
+                left: "0mm"
+            }
+        });
+    } catch (error) {
+        fail(
+            error.message,
+            "verify the generated HTML is valid and Puppeteer has permission to write to playbook/."
+        );
+    }
 }
 
 async function run() {
-
     if (!fs.existsSync(HTML_FILE)) {
-
-        throw new Error(
-            "playbook.html not found."
+        fail(
+            "playbook/playbook.html was not found.",
+            "run 'python generate_playbook.py' to generate HTML before exporting the PDF."
         );
-
     }
 
     console.log("");
-
     console.log("====================================");
     console.log(" Enterprise PDF Generator v2 ");
     console.log("====================================");
@@ -106,31 +111,27 @@ async function run() {
     const browser = await launchBrowser();
 
     try {
-
         const page = await loadPage(browser);
 
         console.log("✓ HTML Loaded");
 
         await exportPDF(page);
 
+        if (!fs.existsSync(OUTPUT_FILE)) {
+            fail(
+                "Enterprise-ERP-UI-Blueprint.pdf was not created.",
+                "check Puppeteer output and disk permissions for the playbook/ folder."
+            );
+        }
+
         console.log("✓ PDF Generated");
-
-    }
-
-    finally {
-
+    } finally {
         await browser.close();
-
     }
 
     console.log("Done.");
-
 }
 
-run().catch(error => {
-
-    console.error(error);
-
-    process.exit(1);
-
+run().catch((error) => {
+    fail(error.message, "review the stack trace above and retry after fixing the root cause.");
 });

@@ -3,7 +3,10 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
+
+from generate_playbook_pdf import collect_build_issues
 
 
 ROOT = Path(__file__).resolve().parent
@@ -13,7 +16,13 @@ PLAYBOOK_HTML = ROOT / "playbook" / "playbook.html"
 PLAYBOOK_PDF = ROOT / "playbook" / "Enterprise-ERP-UI-Blueprint.pdf"
 
 
-def main() -> None:
+def main() -> int:
+    issues = collect_build_issues(require_node=False)
+    if issues:
+        for issue in issues:
+            print(f"Error: {issue}", file=sys.stderr)
+        return 1
+
     env = os.environ.copy()
     env["PLAYBOOK_ASSETS_BASE"] = "assets"
     env["PLAYBOOK_HTML_ONLY"] = "1"
@@ -32,7 +41,8 @@ def main() -> None:
         shutil.copy(PLAYBOOK_PDF, SITE_DIR / "Enterprise-ERP-UI-Blueprint.pdf")
 
     print(f"GitHub Pages site built: {SITE_DIR}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

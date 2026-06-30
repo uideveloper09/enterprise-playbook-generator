@@ -8,10 +8,9 @@ site_dir: site
 
 theme:
   name: material
-  custom_dir: overrides
   language: en
-  logo: assets/images/force-logo.png
-  favicon: assets/images/force-logo.png
+  logo: assets/brand/force-logo.png
+  favicon: assets/brand/force-logo.png
   palette:
     - scheme: default
       primary: white
@@ -55,12 +54,6 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.tabbed:
       alternate_style: true
-
-extra_css:
-  - assets/css/enterprise.css
-
-extra_javascript:
-  - assets/js/reading-progress.js
 
 copyright: >
   © 2026 Force Intellect<br>

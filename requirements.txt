@@ -1,1 +1,3 @@
+# Optional dependencies for MkDocs preview only.
+# The HTML/PDF build uses Python standard library via generate_playbook_pdf.py.
 mkdocs-material
