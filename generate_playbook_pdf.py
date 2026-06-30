@@ -372,7 +372,6 @@ def collect_build_issues(*, require_node: bool = False) -> list[str]:
     required_dirs = {
         "docs": DOCS_DIR,
         "assets": ROOT / "assets",
-        "playbook": PLAYBOOK_DIR,
     }
     for name, path in required_dirs.items():
         if not path.is_dir():
