@@ -112,14 +112,17 @@ The playbook is published automatically on every push to `main` via GitHub Actio
 
 ### First-time setup (required once)
 
-The deploy job returns **404 Not Found** until GitHub Pages is enabled on the repository.
+Until this is done, `uideveloper09.github.io/enterprise-playbook-generator` shows a **404** page.
 
-1. Open **[Repository Settings → Pages](https://github.com/uideveloper09/enterprise-playbook-generator/settings/pages)**
-2. Under **Build and deployment**, set **Source** to **GitHub Actions**
-3. Save, then re-run the workflow:
-   - **[Actions → Deploy GitHub Pages → Re-run all jobs](https://github.com/uideveloper09/enterprise-playbook-generator/actions)**
+1. Open **[Settings → Pages](https://github.com/uideveloper09/enterprise-playbook-generator/settings/pages)**
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**
+3. Choose **Branch: `gh-pages`** and folder **`/ (root)`**, then click **Save**
+4. Wait for the workflow to finish (or run it manually):
+   - **[Actions → Deploy GitHub Pages → Run workflow](https://github.com/uideveloper09/enterprise-playbook-generator/actions/workflows/deploy-pages.yml)**
 
-After Pages is enabled, every push to `main` deploys automatically.
+The workflow builds the playbook and pushes the site to the `gh-pages` branch automatically on every `main` push.
+
+After 1–2 minutes, the live site should load at the URL above.
 
 ### Build locally
 
