@@ -40,6 +40,10 @@ def main() -> int:
     shutil.copytree(ASSETS_DIR, SITE_DIR / "assets")
     shutil.copy(PLAYBOOK_HTML, SITE_DIR / "index.html")
 
+    favicon_src = ASSETS_DIR / "icons" / "favicon.png"
+    if favicon_src.is_file():
+        shutil.copy(favicon_src, SITE_DIR / "favicon.png")
+
     if PLAYBOOK_PDF.exists():
         shutil.copy(PLAYBOOK_PDF, SITE_DIR / "Enterprise-ERP-UI-Blueprint.pdf")
 
